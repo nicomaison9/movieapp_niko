@@ -24,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import movieapp.dto.MovieStat;
 import movieapp.dto.NameYearTitle;
+import movieapp.dto.Playstatistics;
 import movieapp.entity.Artist;
 import movieapp.entity.Movie;
 
@@ -133,7 +134,8 @@ class TestHibernateQueriesJPQL {
 		//		inner join stars artist2_ on actors1_.id_actor=artist2_.id 
 		// where artist2_.name=?
 		entityManager.createQuery(
-				"select m from Movie m join m.actors a where a.name = :name",
+				"select m from Movie m join m.plays p join p.actor a "
+				+ "where a.name = :name",
 				Movie.class)
 			.setParameter("name", "Clint Eastwood")
 			.getResultStream()
@@ -141,6 +143,39 @@ class TestHibernateQueriesJPQL {
 		
 	}
 	
+	
+	@Test
+	// trouver les acteurs qui ont joué james bond (artist)
+	void test_select_actors_playing_role() {
+		String role= "James Bond";
+		
+	
+		var actors=entityManager.createQuery(
+				"select distinct a from Play p join p.actor a "
+				+ "where p.role like :role",
+				Artist.class)
+			.setParameter("role", role)
+			.getResultList();
+		System.out.println("actors playing"+role+": "+actors+"\n");
+			
+		
+	}
+	
+//	@Test
+	//trouver les acteurs, titre film où ils ont joué james bond(projection)
+//	void test_select_actors_playing_role_projection() {
+//		String role= "James Bond";
+//		
+//	
+//		var roles=entityManager.createQuery(
+//				"select new movieapp.dto.Playstatistics(a.name,m.title) from Play p join p.actor a join p.movie m"
+//				+ " where p.role like :role",Playstatistics.class)
+//				.setParameter("role", role)
+//				.getResultList();
+//		System.out.println("acteurs/films jouant "+ role+" : "+roles);
+//	
+//	}
+		
 	@Test
 	void test_movie_one_stat() {
 		// count(*)

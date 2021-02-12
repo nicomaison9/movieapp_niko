@@ -5,7 +5,9 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -28,6 +30,8 @@ public class Movie {
 	private String title;
 	private Integer year;
 	private Integer duration;
+	
+	private List<String> genres;
 	
 	private Artist director;
 	private List<Artist> actors;
@@ -82,8 +86,18 @@ public class Movie {
 		this.duration = duration;
 	}
 	
+	@ElementCollection
+	@Column(name = "genre")
+	public List<String> getGenres() {
+		return genres;
+	}
+
+	public void setGenres(List<String> genres) {
+		this.genres = genres;
+	}
+
 	// @Transient
-	@ManyToOne // (cascade=CascadeType.PERSIST)
+	@ManyToOne(fetch = FetchType.LAZY) // (cascade=CascadeType.PERSIST)
 	@JoinColumn(name="id_director", nullable=true)
 	public Artist getDirector() {
 		return director;
